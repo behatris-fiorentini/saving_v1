@@ -1,0 +1,72 @@
+CREATE DATABASE savingbeta1
+  WITH OWNER = postgres
+       ENCODING = 'UTF8'
+       TABLESPACE = pg_default
+       LC_COLLATE = 'Portuguese_Brazil.1252'
+       LC_CTYPE = 'Portuguese_Brazil.1252'
+       CONNECTION LIMIT = -1;
+
+
+
+
+CREATE TABLE public.usuario
+(
+  id_usuario integer NOT NULL DEFAULT nextval('usuario_id_usuario_seq'::regclass), -- Identificação do Usúario. Numero sequencial, criado pelo banco de dados e exclusivo. Chave primária.
+  nome_usuario character varying(100) NOT NULL, -- Armazena o nome do usúario cadastrado no sistema
+  email_usuario character varying(55) NOT NULL, -- Armazena o e-mail fornecido pelo usuário. Identificação do usúario no sistema. O e-mail no poderá se repetir entre os usúarios do sistema.
+  senha_usuario character varying(32) NOT NULL, -- Armazena a senha do usúario para login no sistema.
+  data_criacao_conta date, -- Armazena a data do sistema, referente a que o usúario criou sua conta.
+  CONSTRAINT usuario_pkey PRIMARY KEY (id_usuario)
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE public.usuario
+  OWNER TO postgres;
+COMMENT ON COLUMN public.usuario.id_usuario IS 'Identificação do Usúario. Numero sequencial, criado pelo banco de dados e exclusivo. Chave primária.';
+COMMENT ON COLUMN public.usuario.nome_usuario IS 'Armazena o nome do usúario cadastrado no sistema';
+COMMENT ON COLUMN public.usuario.email_usuario IS 'Armazena o e-mail fornecido pelo usuário. Identificação do usúario no sistema. O e-mail no poderá se repetir entre os usúarios do sistema.';
+COMMENT ON COLUMN public.usuario.senha_usuario IS 'Armazena a senha do usúario para login no sistema.';
+COMMENT ON COLUMN public.usuario.data_criacao_conta IS 'Armazena a data do sistema, referente a que o usúario criou sua conta.';
+
+
+-- Table: public.fluxo_capital
+
+-- DROP TABLE public.fluxo_capital;
+
+CREATE TABLE public.fluxo_capital
+(
+  id_fluxo_capital integer NOT NULL DEFAULT nextval('fluxo_capital_id_fluxo_capital_seq'::regclass), -- Chave primaria que representa o gasto/ganho do usuário.
+  id_usuario bigint NOT NULL,
+  tipo character varying(15) NOT NULL, -- Vai definir se o dado cadastrado foi um dinheiro gasto ou ganho.
+  data date NOT NULL, -- Coluna destinada ao armazenamente da data em que o usuario ganhou ou gastou seu dinheiro na ação cadastrada.
+  classificacao character varying(30) NOT NULL, -- Classifica o dado cadastrado. Em que área a pessoa gastou ou recebeu.
+  descricao character varying(150), -- O usuário poderá (opcional) cadastrar outras informações relevantes sobre os o dado a ser cadastrado.
+  outra_classificacao character varying(100), -- Se a classificação que o usuário pretende dar ao dad cadastrado não está na lista, ele pode descrever ela nesse campo.
+  valor money NOT NULL, -- O usuário cadastrará quanto foi gasto ou ganho por ele nessa ação a ser cadastrada.
+  procedencia character varying(50), -- o usuário poderá descrever qual a origem do seu gasto ou ganho. De onde veio. Exemplo: nome da empresa, Local gasto, etc.
+  estado character varying(35), -- Diz respeito se uma conta foi paga ou não, ou como foi paga....
+  descricao_pagamento character varying(150), -- O usuário pode dar detalhes que julga importante a respeito de seu pagamento ( se parcelou, anotou, pegou emprestado ...).
+  CONSTRAINT fluxo_capital_pkey PRIMARY KEY (id_fluxo_capital),
+  CONSTRAINT fluxo_capital_id_usuario_fkey FOREIGN KEY (id_usuario)
+      REFERENCES public.usuario (id_usuario) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+WITH (
+  OIDS=FALSE
+);
+ALTER TABLE public.fluxo_capital
+  OWNER TO postgres;
+COMMENT ON TABLE public.fluxo_capital
+  IS 'Tabela responsável por armazenar todos os gastos e ganhos dos usuários.';
+COMMENT ON COLUMN public.fluxo_capital.id_fluxo_capital IS 'Chave primaria que representa o gasto/ganho do usuário.';
+COMMENT ON COLUMN public.fluxo_capital.tipo IS 'Vai definir se o dado cadastrado foi um dinheiro gasto ou ganho.';
+COMMENT ON COLUMN public.fluxo_capital.data IS 'Coluna destinada ao armazenamente da data em que o usuario ganhou ou gastou seu dinheiro na ação cadastrada.';
+COMMENT ON COLUMN public.fluxo_capital.classificacao IS 'Classifica o dado cadastrado. Em que área a pessoa gastou ou recebeu.';
+COMMENT ON COLUMN public.fluxo_capital.descricao IS 'O usuário poderá (opcional) cadastrar outras informações relevantes sobre os o dado a ser cadastrado.';
+COMMENT ON COLUMN public.fluxo_capital.outra_classificacao IS 'Se a classificação que o usuário pretende dar ao dad cadastrado não está na lista, ele pode descrever ela nesse campo.';
+COMMENT ON COLUMN public.fluxo_capital.valor IS 'O usuário cadastrará quanto foi gasto ou ganho por ele nessa ação a ser cadastrada.';
+COMMENT ON COLUMN public.fluxo_capital.procedencia IS 'o usuário poderá descrever qual a origem do seu gasto ou ganho. De onde veio. Exemplo: nome da empresa, Local gasto, etc.';
+COMMENT ON COLUMN public.fluxo_capital.estado IS 'Diz respeito se uma conta foi paga ou não, ou como foi paga.
+Ou como um ganho foi recebido.';
+COMMENT ON COLUMN public.fluxo_capital.descricao_pagamento IS 'O usuário pode dar detalhes que julga importante a respeito de seu pagamento ( se parcelou, anotou, pegou emprestado ...).';
